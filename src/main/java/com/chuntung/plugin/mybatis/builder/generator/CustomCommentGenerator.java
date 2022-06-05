@@ -95,7 +95,7 @@ public class CustomCommentGenerator implements CommentGenerator {
         topLevelClass.addJavaDocLine("/**");
 
         StringBuilder sb = new StringBuilder();
-        sb.append(" * Table: ").append(introspectedTable.getFullyQualifiedTable());
+        sb.append(" * @TableName: ").append(introspectedTable.getFullyQualifiedTable());
         topLevelClass.addJavaDocLine(sb.toString());
 
         topLevelClass.addJavaDocLine(" */");
