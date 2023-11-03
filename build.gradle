@@ -1,6 +1,7 @@
 plugins {
     id "java"
     id "org.jetbrains.intellij" version "0.4.15"
+//    id "structure-intellij" version "3.264"
 }
 
 intellij {
@@ -25,10 +26,10 @@ publishPlugin {
 }
 
 repositories {
-    jcenter()
     mavenLocal()
+    maven { url "https://maven.aliyun.com/repository/public" }
+    maven { url "https://repo.huaweicloud.com/repository/maven" }
     mavenCentral()
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 }
 
 sourceSets {
@@ -46,7 +47,7 @@ sourceSets {
 }
 
 dependencies {
-    compile ( group: 'org.mybatis.generator', name: 'mybatis-generator-core', version: '1.4.1-SNAPSHOT') {
+    implementation(group: 'org.mybatis.generator', name: 'mybatis-generator-core', version: '1.4.1') {
         exclude group: 'org.junit.jupiter'
         exclude group: 'org.junit.platform'
         exclude group: 'org.assertj'

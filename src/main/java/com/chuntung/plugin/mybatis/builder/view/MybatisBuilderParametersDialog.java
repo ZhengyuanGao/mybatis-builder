@@ -10,6 +10,7 @@ import com.chuntung.plugin.mybatis.builder.generator.*;
 import com.chuntung.plugin.mybatis.builder.generator.plugins.ExampleRowBoundsPlugin;
 import com.chuntung.plugin.mybatis.builder.generator.plugins.LombokPlugin;
 import com.chuntung.plugin.mybatis.builder.generator.plugins.MapperAnnotationPlugin;
+import com.chuntung.plugin.mybatis.builder.generator.plugins.SwaggerPlugin;
 import com.chuntung.plugin.mybatis.builder.generator.plugins.selectwithlock.SelectWithLockConfig;
 import com.chuntung.plugin.mybatis.builder.generator.plugins.selectwithlock.SelectWithLockPlugin;
 import com.chuntung.plugin.mybatis.builder.model.HistoryCategoryEnum;
@@ -74,6 +75,7 @@ public class MybatisBuilderParametersDialog extends DialogWrapper {
     private JComboBox statementComboBox;
     private JCheckBox exampleAllCheckBox;
     private JCheckBox lombokSupportCheckBox;
+    private JCheckBox swaggerSupportCheckBox;
     private JCheckBox selectByPrimaryKeyWithLockCheckBox;
     private JCheckBox databaseRemarkCheckBox;
     private JCheckBox identityCheckBox;
@@ -337,6 +339,9 @@ public class MybatisBuilderParametersDialog extends DialogWrapper {
         boolean lombokEnabled = data.getSelectedPlugins().containsKey(LombokPlugin.class.getName());
         lombokSupportCheckBox.setSelected(lombokEnabled);
 
+        boolean swaggerEnabled = data.getSelectedPlugins().containsKey(SwaggerPlugin.class.getName());
+        swaggerSupportCheckBox.setSelected(swaggerEnabled);
+
         // -- select with lock, not applied to dynamic sql
         String selectWithLockPlugin = SelectWithLockPlugin.class.getName();
         boolean selectWithLockEnabled = data.getSelectedPlugins().containsKey(selectWithLockPlugin);
@@ -463,6 +468,9 @@ public class MybatisBuilderParametersDialog extends DialogWrapper {
         }
         if (lombokSupportCheckBox.isSelected()) {
             data.getSelectedPlugins().put(LombokPlugin.class.getName(), null);
+        }
+        if (swaggerSupportCheckBox.isSelected()) {
+            data.getSelectedPlugins().put(SwaggerPlugin.class.getName(), null);
         }
         if (selectByPrimaryKeyWithLockCheckBox.isSelected() || selectByExampleWithLockCheckBox.isSelected()) {
             SelectWithLockConfig selectWithLockConfig = defaultParameters.getSelectWithLockConfig();
