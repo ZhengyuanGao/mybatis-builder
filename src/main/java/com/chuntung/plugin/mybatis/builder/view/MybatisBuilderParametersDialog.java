@@ -17,9 +17,9 @@ import com.chuntung.plugin.mybatis.builder.model.HistoryCategoryEnum;
 import com.chuntung.plugin.mybatis.builder.model.ObjectTableModel;
 import com.chuntung.plugin.mybatis.builder.model.TableInfo;
 import com.chuntung.plugin.mybatis.builder.util.ConfigUtil;
+import com.chuntung.plugin.mybatis.builder.util.CustomPackageChooserDialog;
 import com.chuntung.plugin.mybatis.builder.util.StringUtil;
 import com.chuntung.plugin.mybatis.builder.util.ViewUtil;
-import com.intellij.ide.util.PackageChooserDialog;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -29,6 +29,7 @@ import com.intellij.psi.PsiPackage;
 import com.intellij.ui.TextFieldWithHistoryWithBrowseButton;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 import org.mybatis.generator.config.JavaClientGeneratorConfiguration;
 import org.mybatis.generator.config.JavaModelGeneratorConfiguration;
 import org.mybatis.generator.config.SqlMapGeneratorConfiguration;
@@ -101,8 +102,9 @@ public class MybatisBuilderParametersDialog extends DialogWrapper {
     private JToggleButton tableButton;
     private JToggleButton othersButton;
     private JPanel cardContainer;
-    private JButton sameSourcePathButton;
     private JPanel othersPanel;
+    private JButton syncBtn;
+    private JButton syncButton;
 
     private boolean morePanelVisible = false;
 
@@ -282,25 +284,30 @@ public class MybatisBuilderParametersDialog extends DialogWrapper {
         javaClientProjectText.addBrowseFolderListener("Choose source path", "", null, FOLDER_DESCRIPTOR);
         sqlMapProjectText.addBrowseFolderListener("Choose resource path", "", null, FOLDER_DESCRIPTOR);
 
-        sameSourcePathButton.addActionListener(e->{
+        syncButton.addActionListener(e->{
             javaClientProjectText.setText(javaModelProjectText.getText());
+        });
+        syncBtn.addActionListener(e->{
+            String sourcePath = javaModelProjectText.getText();
+            sqlMapProjectText.setText(sourcePath.endsWith("java") ? sourcePath.substring(0, sourcePath.length() - 4) + "resources" : sourcePath);
         });
 
         // package chooser
-        javaModelPackageText.addActionListener(getPackageActionListener(project, javaModelPackageText));
-        javaClientPackageText.addActionListener(getPackageActionListener(project, javaClientPackageText));
-        sqlMapPackageText.addActionListener(getPackageActionListener(project, sqlMapPackageText));
+        javaModelPackageText.addActionListener(getPackageActionListener(project, javaModelPackageText, javaModelProjectText, true));
+        javaClientPackageText.addActionListener(getPackageActionListener(project, javaClientPackageText, javaClientProjectText, true));
+        sqlMapPackageText.addActionListener(getPackageActionListener(project, sqlMapPackageText, sqlMapProjectText, false));
     }
 
     @NotNull
-    private ActionListener getPackageActionListener(Project project, TextFieldWithHistoryWithBrowseButton textField) {
+    private ActionListener getPackageActionListener(Project project, TextFieldWithHistoryWithBrowseButton packageText, TextFieldWithBrowseButton sourceText, boolean javaPackage) {
         return e -> {
-            PackageChooserDialog chooser = new PackageChooserDialog("Choose target package", project);
-            chooser.selectPackage(textField.getText());
-            chooser.show();
-            PsiPackage selectedPackage = chooser.getSelectedPackage();
-            if (selectedPackage != null) {
-                textField.setTextAndAddToHistory(selectedPackage.getQualifiedName());
+            CustomPackageChooserDialog chooser = new CustomPackageChooserDialog("Choose target package", project,
+                    javaPackage ? JavaModuleSourceRootTypes.SOURCES : JavaModuleSourceRootTypes.RESOURCES, sourceText.getText());
+            chooser.selectPackage(packageText.getText());
+            boolean ok = chooser.showAndGet();
+            if (ok) {
+                PsiPackage selectedPackage = chooser.getSelectedPackage();
+                packageText.setTextAndAddToHistory(selectedPackage.getQualifiedName());
             }
         };
     }

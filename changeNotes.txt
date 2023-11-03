@@ -1,4 +1,3 @@
 <ul>
-<li>Disable log4j as per http://mybatis.org/generator/reference/logging.html</li>
-<li>Fix dynamic sql mapper merging issue.</li>
+<li>Upgrade mybatis generator to 1.4.2.</li>
 </ul>
